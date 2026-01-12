@@ -8,6 +8,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { findUserById } from '../../data/users';
 import { updateRequestStatus } from '../../data/collaborationRequests';
+import { addEventToCalendar } from '../../data/CalendarEvents';   // ✅ new import
 import { formatDistanceToNow } from 'date-fns';
 
 interface CollaborationRequestCardProps {
@@ -21,31 +22,40 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
 }) => {
   const navigate = useNavigate();
   const investor = findUserById(request.investorId);
-  
+
   if (!investor) return null;
-  
+
   const handleAccept = () => {
     updateRequestStatus(request.id, 'accepted');
+
+    // ✅ Push event to Calendar
+    addEventToCalendar({
+      id: request.id,
+      title: `Meeting with ${investor.name}`,
+      start: new Date().toISOString(),
+      allDay: false,
+    });
+
     if (onStatusUpdate) {
       onStatusUpdate(request.id, 'accepted');
     }
   };
-  
+
   const handleReject = () => {
     updateRequestStatus(request.id, 'rejected');
     if (onStatusUpdate) {
       onStatusUpdate(request.id, 'rejected');
     }
   };
-  
+
   const handleMessage = () => {
     navigate(`/chat/${investor.id}`);
   };
-  
+
   const handleViewProfile = () => {
     navigate(`/profile/investor/${investor.id}`);
   };
-  
+
   const getStatusBadge = () => {
     switch (request.status) {
       case 'pending':
@@ -58,7 +68,7 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
         return null;
     }
   };
-  
+
   return (
     <Card className="transition-all duration-300">
       <CardBody className="flex flex-col">
@@ -71,7 +81,7 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
               status={investor.isOnline ? 'online' : 'offline'}
               className="mr-3"
             />
-            
+
             <div>
               <h3 className="text-md font-semibold text-gray-900">{investor.name}</h3>
               <p className="text-sm text-gray-500">
@@ -79,15 +89,15 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
               </p>
             </div>
           </div>
-          
+
           {getStatusBadge()}
         </div>
-        
+
         <div className="mt-4">
           <p className="text-sm text-gray-600">{request.message}</p>
         </div>
       </CardBody>
-      
+
       <CardFooter className="border-t border-gray-100 bg-gray-50">
         {request.status === 'pending' ? (
           <div className="flex justify-between w-full">
@@ -109,7 +119,7 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
                 Accept
               </Button>
             </div>
-            
+
             <Button
               variant="primary"
               size="sm"
@@ -129,7 +139,7 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
             >
               Message
             </Button>
-            
+
             <Button
               variant="primary"
               size="sm"

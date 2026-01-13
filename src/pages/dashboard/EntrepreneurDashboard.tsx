@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Joyride, { Step} from 'react-joyride';
 import { Link } from 'react-router-dom';
 import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -16,7 +17,7 @@ import { CollaborationRequestsList } from '../../components/collaboration/Collab
 export const EntrepreneurDashboard: React.FC = () => {
   const { user } = useAuth();
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
-  const [recommendedInvestors, setRecommendedInvestors] = useState(investors.slice(0, 3));
+  const [recommendedInvestors] = useState(investors.slice(0, 3));
 
   useEffect(() => {
     if (user) {
@@ -38,8 +39,47 @@ export const EntrepreneurDashboard: React.FC = () => {
 
   const pendingRequests = collaborationRequests.filter(req => req.status === 'pending');
 
+  // Milestone 7: Guided Tour Steps
+  const steps: Step[] = [
+    {
+      target: 'body',
+      placement: 'center',
+      content: 'Welcome to Business Nexus! Let us show you around your new dashboard.',
+    },
+    {
+      target: '.stats-grid',
+      content: 'These cards show your startup\'s real-time performance and pending tasks.',
+    },
+    {
+      target: '.collaboration-section',
+      content: 'Manage all your investor requests and connection statuses right here.',
+    },
+    {
+      target: '.investor-recommendations',
+      content: 'We suggest top investors based on your startup industry.',
+    },
+    {
+      target: '.meetings-section',
+      content: 'View your upcoming confirmed meetings and calendar.',
+    }
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-10">
+      {/* React Joyride Component */}
+      <Joyride 
+        steps={steps} 
+        continuous 
+        showProgress 
+        showSkipButton 
+        styles={{
+          options: {
+            primaryColor: '#4f46e6',
+            zIndex: 1000,
+          }
+        }}
+      />
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome, {user.name}</h1>
@@ -47,16 +87,14 @@ export const EntrepreneurDashboard: React.FC = () => {
         </div>
 
         <Link to="/investors">
-          <Button
-            leftIcon={<PlusCircle size={18} />}
-          >
+          <Button leftIcon={<PlusCircle size={18} />}>
             Find Investors
           </Button>
         </Link>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Summary cards - Added 'stats-grid' class */}
+      <div className="stats-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-primary-50 border border-primary-100">
           <CardBody>
             <div className="flex items-center">
@@ -117,10 +155,10 @@ export const EntrepreneurDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Collaboration requests */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Collaboration requests - Added 'collaboration-section' class */}
+        <div className="lg:col-span-2 space-y-4 collaboration-section">
           <Card>
-            <CardHeader className="flex justify-between items-center">
+            <CardHeader className="flex justify-between items-center border-b">
               <h2 className="text-lg font-medium text-gray-900">Collaboration Requests</h2>
               <Badge variant="primary">{pendingRequests.length} pending</Badge>
             </CardHeader>
@@ -142,17 +180,17 @@ export const EntrepreneurDashboard: React.FC = () => {
                     <AlertCircle size={24} className="text-gray-500" />
                   </div>
                   <p className="text-gray-600">No collaboration requests yet</p>
-                  <p className="text-sm text-gray-500 mt-1">When investors are interested in your startup, their requests will appear here</p>
+                  <p className="text-sm text-gray-500 mt-1">When investors are interested, they will appear here</p>
                 </div>
               )}
             </CardBody>
           </Card>
         </div>
 
-        {/* Recommended investors */}
-        <div className="space-y-4">
+        {/* Recommended investors - Added 'investor-recommendations' class */}
+        <div className="space-y-4 investor-recommendations">
           <Card>
-            <CardHeader className="flex justify-between items-center">
+            <CardHeader className="flex justify-between items-center border-b">
               <h2 className="text-lg font-medium text-gray-900">Recommended Investors</h2>
               <Link to="/investors" className="text-sm font-medium text-primary-600 hover:text-primary-500">
                 View all
@@ -170,21 +208,15 @@ export const EntrepreneurDashboard: React.FC = () => {
             </CardBody>
           </Card>
         </div>
+      </div>
 
-        {/* Other dashboard widgets */}
-
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Investor Dashboard</h2>
-          
-           {/* Collaboration Requests */}
+      {/* Confirmed Meetings Section - Added 'meetings-section' class */}
+      <div className="meetings-section mt-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Investor Connections & Meetings</h2>
+        <div className="grid grid-cols-1 gap-6">
            <CollaborationRequestsList />
-
-
-          {/* Confirmed Meetings */}
-          <ConfirmedMeetings />   {/* ✅ Show confirmed meetings */}
+           <ConfirmedMeetings />
         </div>
-
-
       </div>
     </div>
   );

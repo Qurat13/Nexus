@@ -3,21 +3,22 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Home, Building2, CircleDollarSign, Users, Video , MessageCircle, 
-  Bell, FileText, Settings, HelpCircle, Calendar as CalendarIcon
+  Bell, FileText, Settings, HelpCircle, Calendar as CalendarIcon, Wallet
 } from 'lucide-react';
 
 interface SidebarItemProps {
   to: string;
   icon: React.ReactNode;
   text: string;
+  className?: string; // Naya prop add kiya tour classes ke liye
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon, text }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon, text, className }) => {
   return (
     <NavLink
       to={to}
       className={({ isActive }) => 
-        `flex items-center py-2.5 px-4 rounded-md transition-colors duration-200 ${
+        `flex items-center py-2.5 px-4 rounded-md transition-colors duration-200 ${className || ''} ${
           isActive 
             ? 'bg-primary-50 text-primary-700' 
             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -45,7 +46,8 @@ export const Sidebar: React.FC = () => {
     { to: '/documents', icon: <FileText size={20} />, text: 'Documents' },
     { to: '/calendar', icon: <CalendarIcon size={20} />, text: 'Meeting Calendar' },
     { to: '/video-call', icon: <Video size={20} />, text: 'Video Call' },
-
+    // Milestone 7 Fix: Added 'sidebar-payments' class
+    { to: '/payments', icon: <Wallet size={20} />, text: 'Payments', className: 'sidebar-payments' }, 
   ];
   
   // Investor sidebar items
@@ -58,14 +60,15 @@ export const Sidebar: React.FC = () => {
     { to: '/deals', icon: <FileText size={20} />, text: 'Deals' },
     { to: '/calendar', icon: <CalendarIcon size={20} />, text: 'Meeting Calendar' },
     { to: '/video-call', icon: <Video size={20} />, text: 'Video Call' },
-
+    { to: '/payments', icon: <Wallet size={20} />, text: 'Payments', className: 'sidebar-payments' }, 
   ];
   
   const sidebarItems = user.role === 'entrepreneur' ? entrepreneurItems : investorItems;
   
   // Common items at the bottom
   const commonItems = [
-    { to: '/settings', icon: <Settings size={20} />, text: 'Settings' },
+    // Milestone 7 Fix: Added 'settings-link' class
+    { to: '/settings', icon: <Settings size={20} />, text: 'Settings', className: 'settings-link' },
     { to: '/help', icon: <HelpCircle size={20} />, text: 'Help & Support' },
   ];
   
@@ -80,13 +83,14 @@ export const Sidebar: React.FC = () => {
                 to={item.to}
                 icon={item.icon}
                 text={item.text}
+                className={item.className} // Pass the class name
               />
             ))}
           </div>
           
           <div className="mt-8 px-3">
             <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Settings
+              System
             </h3>
             <div className="mt-2 space-y-1">
               {commonItems.map((item, index) => (
@@ -95,6 +99,7 @@ export const Sidebar: React.FC = () => {
                   to={item.to}
                   icon={item.icon}
                   text={item.text}
+                  className={item.className} // Pass the class name
                 />
               ))}
             </div>
@@ -102,8 +107,8 @@ export const Sidebar: React.FC = () => {
         </div>
         
         <div className="p-4 border-t border-gray-200">
-          <div className="bg-gray-50 rounded-md p-3">
-            <p className="text-xs text-gray-600">Need assistance?</p>
+          <div className="bg-indigo-50 rounded-md p-3 border border-indigo-100">
+            <p className="text-xs text-indigo-600 font-bold">Need assistance?</p>
             <h4 className="text-sm font-medium text-gray-900 mt-1">Contact Support</h4>
             <a 
               href="mailto:support@businessnexus.com" 
